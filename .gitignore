@@ -54,6 +54,4 @@ Thumbs.db
 .turbo/
 .pnpm-store/
 
-
-
-
+.pnpmfile.cjs

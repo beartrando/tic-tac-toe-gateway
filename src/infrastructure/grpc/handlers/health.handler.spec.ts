@@ -7,124 +7,124 @@ import LivezUseCase from '../../../application/use-cases/health/livez';
 import ReadyzUseCase from '../../../application/use-cases/health/readyz';
 
 describe('HealthHandler', () => {
-  let healthHandler: HealthHandler;
-  let mockHealthUseCase: jest.Mocked<HealthUseCase>;
-  let mockStatusUseCase: jest.Mocked<StatusUseCase>;
-  let mockLivezUseCase: jest.Mocked<LivezUseCase>;
-  let mockReadyzUseCase: jest.Mocked<ReadyzUseCase>;
-  let mockCall: any;
-  let mockCallback: jest.Mock;
+    let healthHandler: HealthHandler;
+    let mockHealthUseCase: jest.Mocked<HealthUseCase>;
+    let mockStatusUseCase: jest.Mocked<StatusUseCase>;
+    let mockLivezUseCase: jest.Mocked<LivezUseCase>;
+    let mockReadyzUseCase: jest.Mocked<ReadyzUseCase>;
+    let mockCall: any;
+    let mockCallback: jest.Mock;
 
-  beforeEach(() => {
-    mockHealthUseCase = {
-      execute: jest.fn(),
-    } as unknown as jest.Mocked<HealthUseCase>;
+    beforeEach(() => {
+        mockHealthUseCase = {
+            execute: jest.fn(),
+        } as unknown as jest.Mocked<HealthUseCase>;
 
-    mockStatusUseCase = {
-      execute: jest.fn(),
-    } as unknown as jest.Mocked<StatusUseCase>;
+        mockStatusUseCase = {
+            execute: jest.fn(),
+        } as unknown as jest.Mocked<StatusUseCase>;
 
-    mockLivezUseCase = {
-      execute: jest.fn(),
-    } as unknown as jest.Mocked<LivezUseCase>;
+        mockLivezUseCase = {
+            execute: jest.fn(),
+        } as unknown as jest.Mocked<LivezUseCase>;
 
-    mockReadyzUseCase = {
-      execute: jest.fn(),
-    } as unknown as jest.Mocked<ReadyzUseCase>;
+        mockReadyzUseCase = {
+            execute: jest.fn(),
+        } as unknown as jest.Mocked<ReadyzUseCase>;
 
-    healthHandler = new HealthHandler(
-      mockHealthUseCase,
-      mockStatusUseCase,
-      mockLivezUseCase,
-      mockReadyzUseCase,
-    );
+        healthHandler = new HealthHandler(
+            mockHealthUseCase,
+            mockStatusUseCase,
+            mockLivezUseCase,
+            mockReadyzUseCase,
+        );
 
-    mockCall = {
-      request: {},
-    };
+        mockCall = {
+            request: {},
+        };
 
-    mockCallback = jest.fn();
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  describe('check', () => {
-    it('should call healthUseCase and return response', async () => {
-      const mockResponse: healthProto.HealthReport = {
-        service: 'gateway',
-        status: healthProto.HealthStatus.HEALTH_STATUS_OK,
-        components: {auth: healthProto.HealthStatus.HEALTH_STATUS_OK},
-        timestamp: new Date(),
-      };
-
-      mockHealthUseCase.execute.mockResolvedValue(mockResponse);
-
-      await healthHandler.check(mockCall, mockCallback);
-
-      expect(mockHealthUseCase.execute).toHaveBeenCalledTimes(1);
-      expect(mockCallback).toHaveBeenCalledWith(null, mockResponse);
+        mockCallback = jest.fn();
     });
 
-    it('should call callbackError on error', async () => {
-      const error = new Error('Health check failed');
-      mockHealthUseCase.execute.mockRejectedValue(error);
-
-      await healthHandler.check(mockCall, mockCallback);
-
-      expect(mockCallback).toHaveBeenCalledWith(
-        expect.objectContaining({code: expect.any(Number), details: 'Health check failed'}),
-        null
-      );
+    afterEach(() => {
+        jest.clearAllMocks();
     });
-  });
 
-  describe('status', () => {
-    it('should call statusUseCase and return response', async () => {
-      const mockResponse: healthProto.ServiceStatus = {
-        service: 'gateway',
-        status: healthProto.HealthStatus.HEALTH_STATUS_OK,
-        timestamp: new Date(),
-      };
+    describe('check', () => {
+        it('should call healthUseCase and return response', async () => {
+            const mockResponse: healthProto.HealthReport = {
+                service: 'gateway',
+                status: healthProto.HealthStatus.HEALTH_STATUS_OK,
+                components: {auth: healthProto.HealthStatus.HEALTH_STATUS_OK},
+                timestamp: new Date(),
+            };
 
-      mockStatusUseCase.execute.mockResolvedValue(mockResponse);
+            mockHealthUseCase.execute.mockResolvedValue(mockResponse);
 
-      await healthHandler.status(mockCall, mockCallback);
+            await healthHandler.check(mockCall, mockCallback);
 
-      expect(mockStatusUseCase.execute).toHaveBeenCalledTimes(1);
-      expect(mockCallback).toHaveBeenCalledWith(null, mockResponse);
+            expect(mockHealthUseCase.execute).toHaveBeenCalledTimes(1);
+            expect(mockCallback).toHaveBeenCalledWith(null, mockResponse);
+        });
+
+        it('should call callbackError on error', async () => {
+            const error = new Error('Health check failed');
+            mockHealthUseCase.execute.mockRejectedValue(error);
+
+            await healthHandler.check(mockCall, mockCallback);
+
+            expect(mockCallback).toHaveBeenCalledWith(
+                expect.objectContaining({code: expect.any(Number), details: 'Health check failed'}),
+                null
+            );
+        });
     });
-  });
 
-  describe('livez', () => {
-    it('should call livezUseCase and return response', async () => {
-      const mockResponse: healthProto.LiveStatus = {
-        status: healthProto.HealthStatus.HEALTH_STATUS_OK,
-      };
+    describe('status', () => {
+        it('should call statusUseCase and return response', async () => {
+            const mockResponse: healthProto.ServiceStatus = {
+                service: 'gateway',
+                status: healthProto.HealthStatus.HEALTH_STATUS_OK,
+                timestamp: new Date(),
+            };
 
-      mockLivezUseCase.execute.mockResolvedValue(mockResponse);
+            mockStatusUseCase.execute.mockResolvedValue(mockResponse);
 
-      await healthHandler.livez(mockCall, mockCallback);
+            await healthHandler.status(mockCall, mockCallback);
 
-      expect(mockLivezUseCase.execute).toHaveBeenCalledTimes(1);
-      expect(mockCallback).toHaveBeenCalledWith(null, mockResponse);
+            expect(mockStatusUseCase.execute).toHaveBeenCalledTimes(1);
+            expect(mockCallback).toHaveBeenCalledWith(null, mockResponse);
+        });
     });
-  });
 
-  describe('readyz', () => {
-    it('should call readyzUseCase and return response', async () => {
-      const mockResponse: healthProto.ReadyStatus = {
-        status: healthProto.HealthStatus.HEALTH_STATUS_OK,
-        components: {db: healthProto.HealthStatus.HEALTH_STATUS_OK},
-      };
+    describe('livez', () => {
+        it('should call livezUseCase and return response', async () => {
+            const mockResponse: healthProto.LiveStatus = {
+                status: healthProto.HealthStatus.HEALTH_STATUS_OK,
+            };
 
-      mockReadyzUseCase.execute.mockResolvedValue(mockResponse);
+            mockLivezUseCase.execute.mockResolvedValue(mockResponse);
 
-      await healthHandler.readyz(mockCall, mockCallback);
+            await healthHandler.livez(mockCall, mockCallback);
 
-      expect(mockReadyzUseCase.execute).toHaveBeenCalledTimes(1);
-      expect(mockCallback).toHaveBeenCalledWith(null, mockResponse);
+            expect(mockLivezUseCase.execute).toHaveBeenCalledTimes(1);
+            expect(mockCallback).toHaveBeenCalledWith(null, mockResponse);
+        });
     });
-  });
+
+    describe('readyz', () => {
+        it('should call readyzUseCase and return response', async () => {
+            const mockResponse: healthProto.ReadyStatus = {
+                status: healthProto.HealthStatus.HEALTH_STATUS_OK,
+                components: {db: healthProto.HealthStatus.HEALTH_STATUS_OK},
+            };
+
+            mockReadyzUseCase.execute.mockResolvedValue(mockResponse);
+
+            await healthHandler.readyz(mockCall, mockCallback);
+
+            expect(mockReadyzUseCase.execute).toHaveBeenCalledTimes(1);
+            expect(mockCallback).toHaveBeenCalledWith(null, mockResponse);
+        });
+    });
 });
