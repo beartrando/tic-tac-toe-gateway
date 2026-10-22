@@ -1,3 +1,4 @@
+/// <reference types="jest" />
 
 // Mock logger to avoid noise in tests
 jest.mock('@shared/logger', () => ({
