@@ -16,6 +16,7 @@ COPY tsconfig.base.json ./
 
 COPY services/gateway/package*.json ./services/gateway/
 COPY services/gateway/jest.config.js ./services/gateway/
+COPY services/gateway/jest.setup.ts ./services/gateway/
 COPY services/gateway/tsconfig.json ./services/gateway/
 COPY services/gateway/jest.setup.ts ./services/gateway/
 COPY services/gateway/src ./services/gateway/src/
@@ -43,14 +44,14 @@ RUN pnpm --filter gateway proto:generate
 #RUN pnpm --filter @shared/cache-store build
 #RUN pnpm --filter @shared/state-store build
 #RUN pnpm --filter @shared/timer build
+#RUN pnpm --filter @shared/kafka-manager build
+#RUN pnpm --filter @shared/persistent-logger build
+#RUN pnpm --filter @shared/pg-boss-manager build
 RUN pnpm --filter @shared/logger build
 RUN pnpm --filter @shared/grpc-client-manager build
 RUN pnpm --filter @shared/errors proto:generate
 RUN pnpm --filter @shared/errors build
-#RUN pnpm --filter @shared/kafka-manager build
-#RUN pnpm --filter @shared/persistent-logger build
 RUN pnpm --filter @shared/otel build
-#RUN pnpm --filter @shared/pg-boss-manager build
 
 RUN pnpm --filter gateway prisma:generate
 
