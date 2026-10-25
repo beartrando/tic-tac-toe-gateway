@@ -16,6 +16,7 @@ import ProxyController from "../infrastructure/http/controllers/proxy-controller
 import microservicesConfig from "../infrastructure/grpc/config/microservices.config";
 import GatewayRouter from "../infrastructure/http/routes/health.routes";
 import Application from "../application/application";
+import * as healthProto from "../contracts/proto/common/health";
 
 function buildApplication() {
 
@@ -50,8 +51,20 @@ function buildApplication() {
     const proxyController = new ProxyController(orchestrationService);
 
 
-    const httpService = new HttpServerService(httpConfig.port, gatewayRouter, proxyController);
-    const grpcService = new GrpcService(grpcConfig.port, healthHandler);
+    const httpService = new HttpServerService(httpConfig.port);
+    httpService.addRouter('/gateway', gatewayRouter.router);
+    // Прокси монтируется на "/" последним, иначе он перехватывает /gateway/* (health и др.)
+    httpService.addRouter(proxyController.proxy);
+    const grpcService = new GrpcService(grpcConfig.port);
+    grpcService.registerService(
+        healthProto.HealthService,
+        {
+            check: healthHandler.check.bind(healthHandler),
+            status: healthHandler.status.bind(healthHandler),
+            livez: healthHandler.livez.bind(healthHandler),
+            readyz: healthHandler.readyz.bind(healthHandler),
+        }
+    );
 
     const application = new Application(grpcService, httpService);
 

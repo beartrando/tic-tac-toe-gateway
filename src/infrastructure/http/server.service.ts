@@ -1,5 +1,5 @@
 import logger from "@shared/logger";
-import express, {Express} from 'express';
+import express, {Express, Router, RequestHandler} from 'express';
 import morgan from 'morgan';
 import cors from 'cors'
 // import cookieParser from "cookie-parser";
@@ -11,7 +11,7 @@ export class HttpServerService {
     private readonly app: Express;
     private server?: Server;
 
-    constructor(private readonly httpPort: number, private readonly gatewayRouter: GatewayRouter, private readonly proxyController: ProxyController) {
+    constructor(private readonly httpPort: number) {
 
         this.app = express();
         this.app.use(express.json());
@@ -22,10 +22,14 @@ export class HttpServerService {
             allowedHeaders: ['Content-Type', 'Authorization'],
         }));
         // this.app.use(cookieParser());
+    }
 
-
-        this.app.use('/gateway', gatewayRouter.router);
-        this.app.use(proxyController.proxy);
+    addRouter(routeOrProxy: string | RequestHandler, router?: Router): void {
+        if (typeof routeOrProxy === 'string') {
+            this.app.use(routeOrProxy, router!);
+        } else {
+            this.app.use(routeOrProxy);
+        }
     }
 
     async start(): Promise<void> {

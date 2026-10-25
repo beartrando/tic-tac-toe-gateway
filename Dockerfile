@@ -16,7 +16,9 @@ COPY tsconfig.base.json ./
 
 COPY services/gateway/package*.json ./services/gateway/
 COPY services/gateway/jest.config.js ./services/gateway/
+COPY services/gateway/jest.setup.ts ./services/gateway/
 COPY services/gateway/tsconfig.json ./services/gateway/
+COPY services/gateway/jest.setup.ts ./services/gateway/
 COPY services/gateway/src ./services/gateway/src/
 
 RUN apt-get update \
@@ -27,7 +29,7 @@ RUN apt-get update \
         wget \
     && rm -rf /var/lib/apt/lists/*
 
-RUN corepack enable && corepack prepare pnpm@11.9.0 --activate
+RUN corepack enable && corepack prepare pnpm@11.28.4 --activate
 
 
 # ---------- DEPS ----------
@@ -39,17 +41,19 @@ RUN pnpm install --offline --frozen-lockfile --ignore-scripts
 RUN mkdir -p ./services/gateway/src/contracts/proto
 RUN pnpm --filter gateway proto:generate
 
+RUN pnpm --filter @shared/logger build
 #RUN pnpm --filter @shared/cache-store build
 #RUN pnpm --filter @shared/state-store build
 #RUN pnpm --filter @shared/timer build
-RUN pnpm --filter @shared/logger build
+#RUN pnpm --filter @shared/kafka-manager build
+#RUN pnpm --filter @shared/persistent-logger build
+#RUN pnpm --filter @shared/pg-boss-manager build
 RUN pnpm --filter @shared/grpc-client-manager build
 RUN pnpm --filter @shared/errors proto:generate
 RUN pnpm --filter @shared/errors build
-#RUN pnpm --filter @shared/kafka-manager build
-#RUN pnpm --filter @shared/pg-boss-manager build
+RUN pnpm --filter @shared/otel build
 
-#RUN pnpm --filter gateway prisma:generate
+RUN pnpm --filter gateway prisma:generate
 
 # ---------- DEV ----------
 FROM deps AS dev
