@@ -14,12 +14,12 @@ COPY package.json ./
 COPY pnpm-workspace.yaml ./
 COPY tsconfig.base.json ./
 
-COPY services/gateway/package*.json ./services/gateway/
-COPY services/gateway/jest.config.js ./services/gateway/
-COPY services/gateway/jest.setup.ts ./services/gateway/
-COPY services/gateway/tsconfig.json ./services/gateway/
-COPY services/gateway/jest.setup.ts ./services/gateway/
-COPY services/gateway/src ./services/gateway/src/
+COPY services/server/gateway/package*.json ./services/server/gateway/
+COPY services/server/gateway/jest.config.js ./services/server/gateway/
+COPY services/server/gateway/jest.setup.ts ./services/server/gateway/
+COPY services/server/gateway/tsconfig.json ./services/server/gateway/
+COPY services/server/gateway/jest.setup.ts ./services/server/gateway/
+COPY services/server/gateway/src ./services/server/gateway/src/
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -38,7 +38,7 @@ FROM base AS deps
 RUN pnpm fetch
 RUN pnpm install --offline --frozen-lockfile --ignore-scripts
 
-RUN mkdir -p ./services/gateway/src/contracts/proto
+RUN mkdir -p ./services/server/gateway/src/contracts/proto
 RUN pnpm --filter gateway proto:generate
 
 RUN pnpm --filter @shared/logger build
@@ -58,7 +58,7 @@ RUN pnpm --filter gateway prisma:generate
 # ---------- DEV ----------
 FROM deps AS dev
 
-COPY services/gateway/tsconfig.test.json ./services/gateway/
+COPY services/server/gateway/tsconfig.test.json ./services/server/gateway/
 
 ENV NODE_ENV=development
 
@@ -72,7 +72,7 @@ EXPOSE 9090
 CMD ["pnpm", "--filter", "gateway", "dev"]
 
 HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:9090/livez || exit 1
+  CMD wget -q --spider http://localhost:9090/gateway/livez || exit 1
 
 # ---------- BUILD ----------
 FROM deps AS build
@@ -115,7 +115,7 @@ EXPOSE 9090
 CMD ["node", "dist/app.js"]
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD curl -f http://localhost:9090/livez || exit 1
+  CMD wget -q --spider http://localhost:9090/gateway/livez || exit 1
 
 # ---------- PREDEPLOY ----------
 FROM node:22-slim AS predeploy
