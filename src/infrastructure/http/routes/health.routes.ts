@@ -1,7 +1,7 @@
 import {Router, type Router as ExpressRouter} from "express";
-import HealthController from "../controllers/gateway.controller";
+import HealthController from "../controllers/health.controller";
 
-export class GatewayRouter {
+export class HealthRouter {
 
     readonly router: ExpressRouter;
 
@@ -17,4 +17,4 @@ export class GatewayRouter {
     }
 }
 
-export default GatewayRouter;
+export default HealthRouter;

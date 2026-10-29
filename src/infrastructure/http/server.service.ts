@@ -5,7 +5,6 @@ import cors from 'cors'
 // import cookieParser from "cookie-parser";
 import {Server} from "http";
 import ProxyController from "./controllers/proxy-controller";
-import GatewayRouter from "./routes/health.routes";
 
 export class HttpServerService {
     private readonly app: Express;
