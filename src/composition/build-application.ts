@@ -21,6 +21,10 @@ import Application from "../application/application";
 import * as healthProto from "../contracts/proto/common/health";
 import DebugLogUseCase from "../application/use-cases/debug-log/debug-log";
 
+import {ElasticService, MessageLogger} from "@shared/persistent-logger";
+import elasticConfig from "../infrastructure/persistent-logger/elastic.config";
+import messagesConfig from "../infrastructure/persistent-logger/persistent-logger-messages.config";
+
 function buildApplication() {
 
     const healthAggregator = new HealthAggregator();
@@ -31,7 +35,11 @@ function buildApplication() {
     const livezUseCase = new LivezUseCase;
     const readyzUseCase = new ReadyzUseCase;
 
-    const debugLogUseCase = new DebugLogUseCase();
+    // Elasticsearch: транспортные сообщения gateway (в т.ч. тестовые логи /gateway/log)
+    const elasticService = new ElasticService(elasticConfig);
+    const messageLogger = new MessageLogger(elasticService, messagesConfig);
+
+    const debugLogUseCase = new DebugLogUseCase(messageLogger);
 
     const healthHandler = new HealthHandler(
         healthUseCase,
@@ -74,7 +82,7 @@ function buildApplication() {
         }
     );
 
-    const application = new Application(grpcService, httpService);
+    const application = new Application(grpcService, httpService, elasticService);
 
     return application;
 }

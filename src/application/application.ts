@@ -1,4 +1,5 @@
 import logger from "@shared/logger";
+import type {ElasticService} from "@shared/persistent-logger";
 import GrpcService from "../infrastructure/grpc/service";
 import HttpServerService from "../infrastructure/http/server.service";
 
@@ -6,6 +7,7 @@ export class Application {
     constructor(
         private readonly grpcService: GrpcService,
         private readonly httpService: HttpServerService,
+        private readonly elasticService?: ElasticService,
     ) {
     }
 
@@ -26,6 +28,12 @@ export class Application {
             await this.grpcService.start();
             await this.httpService.start();
 
+            if (this.elasticService && !await this.elasticService.check()) {
+                logger.warn(
+                    '⚠️ Elasticsearch is unavailable, gateway logs will not be indexed',
+                );
+            }
+
             logger.info(
                 '🚀 Gateway service started',
             );
@@ -41,6 +49,7 @@ export class Application {
     async stop() {
         await this.grpcService.stop();
         await this.httpService.stop();
+        await this.elasticService?.stop();
     }
 }
 
