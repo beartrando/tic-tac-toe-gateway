@@ -8,7 +8,8 @@ import GrpcService from "../infrastructure/grpc/service";
 import HealthAggregator from "../infrastructure/grpc/clients/health.aggregator";
 import grpcConfig from "../infrastructure/grpc/config/config";
 import httpConfig from "../infrastructure/http/configs/http.server.config";
-import HealthController from "../infrastructure/http/controllers/gateway.controller";
+import HealthController from "../infrastructure/http/controllers/health.controller";
+import GatewayController from "../infrastructure/http/controllers/gateway.controller";
 import HttpServerService from "../infrastructure/http/server.service";
 import OrchestrationService from "../infrastructure/orchestration/service";
 import OrchestrationClient from "../infrastructure/grpc/clients/orchestration.client";
@@ -45,11 +46,12 @@ function buildApplication() {
         statusUseCase,
         livezUseCase,
         readyzUseCase,
-        debugLogUseCase,
     );
 
+    const gatewayController = new GatewayController(debugLogUseCase);
+
     const healthRouter = new HealthRouter(healthController);
-    const gatewayRouter = new GatewayRouter(healthController);
+    const gatewayRouter = new GatewayRouter(gatewayController);
 
     const orchestrationClient = new OrchestrationClient(microservicesConfig.orchestration.url);
     const orchestrationService = new OrchestrationService(orchestrationClient);

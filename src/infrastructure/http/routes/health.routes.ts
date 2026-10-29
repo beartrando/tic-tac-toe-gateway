@@ -1,12 +1,12 @@
 import {Router, type Router as ExpressRouter} from "express";
-import GatewayController from "../controllers/gateway.controller";
+import HealthController from "../controllers/health.controller";
 
 export class HealthRouter {
 
     readonly router: ExpressRouter;
 
     constructor(
-        private readonly healthController: GatewayController,
+        private readonly healthController: HealthController,
     ) {
         this.router = Router();
         this.router.get("/health", this.healthController.health,);
