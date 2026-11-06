@@ -83,7 +83,7 @@ RUN pnpm --filter gateway build
 
 RUN pnpm --filter gateway deploy /deploy --prod
 
-RUN #GENERATED_PRISMA_DIR=$(dirname "$(find /usr/src/app/node_modules/.pnpm -path "*/.prisma/client/default.js" | head -1)") \
+#RUN GENERATED_PRISMA_DIR=$(dirname "$(find /usr/src/app/node_modules/.pnpm -path "*/.prisma/client/default.js" | head -1)") \
 #    && PRISMA_PKG_DIR=$(find /deploy/node_modules/.pnpm -type d -name client -path "*@prisma*" | head -1) \
 #    && NODE_MODULES_DIR=$(dirname "$(dirname "$PRISMA_PKG_DIR")") \
 #    && mkdir -p "$NODE_MODULES_DIR/.prisma" \
