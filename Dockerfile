@@ -150,7 +150,7 @@ COPY --from=build /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/services/server/gateway/node_modules ./services/server/gateway/node_modules
 
 # Только схема и миграции
-COPY services/server/gateway/src/infrastructure/db/prisma ./services/server/gateway/src/infrastructure/db/prisma
+#COPY services/server/gateway/src/infrastructure/db/prisma ./services/server/gateway/src/infrastructure/db/prisma
 
 RUN printf "%s\n" "$VERSION" > VERSION
 
