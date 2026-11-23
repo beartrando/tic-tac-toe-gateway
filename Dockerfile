@@ -132,30 +132,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 # ---------- PREDEPLOY ----------
 FROM node:22-slim AS predeploy
 
-ARG VERSION=dev
-
-ENV APP_VERSION=$VERSION
-ENV NODE_ENV=production
-
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        openssl \
-        wget \
-    && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /usr/src/app
-
-# Только зависимости workspace, необходимые Prisma CLI
-COPY --from=build /usr/src/app/node_modules ./node_modules
-COPY --from=build /usr/src/app/services/server/gateway/node_modules ./services/server/gateway/node_modules
-
-# Только схема и миграции
-#COPY services/server/gateway/src/infrastructure/db/prisma ./services/server/gateway/src/infrastructure/db/prisma
-
-RUN printf "%s\n" "$VERSION" > VERSION
-
-LABEL org.opencontainers.image.version="$VERSION"
-
-WORKDIR /usr/src/app/services/server/gateway
-
-CMD ["./node_modules/.bin/prisma", "migrate", "deploy", "--schema=src/infrastructure/db/prisma/schema.prisma"]
+CMD ["sh", "-c", "echo 'no predeploy step'"]
