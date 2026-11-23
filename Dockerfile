@@ -53,6 +53,15 @@ RUN pnpm --filter @shared/errors proto:generate
 RUN pnpm --filter @shared/errors build
 RUN pnpm --filter @shared/otel build
 
+# pnpm "injects" workspace packages that have runtime dependencies
+# (e.g. @shared/persistent-logger) into node_modules/.pnpm as a snapshot taken
+# at install time. Their dist/ is produced above, after that snapshot, so the
+# injected copy contains only package.json and tsc cannot resolve the package.
+# A clean re-install re-snapshots workspace packages with their build output.
+# Must run before prisma:generate, which writes into node_modules.
+RUN rm -rf node_modules \
+    && pnpm install --offline --frozen-lockfile --ignore-scripts
+
 RUN pnpm --filter gateway prisma:generate
 
 RUN echo "=== PERSISTENT LOGGER VERSION ===" \
