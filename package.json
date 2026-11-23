@@ -6,6 +6,10 @@
     "stage": "ts-node-dev --respawn --transpile-only src/app.ts",
     "build": "tsc -p tsconfig.json",
     "prisma:generate": "echo 'prisma:generate is not needed'",
+    "migrate": "echo 'prisma migrate is not needed'",
+    "migrate:deploy": "echo 'prisma migrate is not needed'",
+    "migrate:reset": "echo 'prisma migrate reset is not needed'",
+    "seed": "echo 'seed is not needed'",
     "proto:generate": "pnpm exec protoc --plugin=protoc-gen-ts_proto=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=src/contracts/proto --ts_proto_opt=outputServices=grpc-js,useExactTypes=false,esModuleInterop=true --proto_path=../../../proto/ ../../../proto/*.proto ../../../proto/**/*.proto",
     "start": "node ./dist/app.js",
     "test": "jest"

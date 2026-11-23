@@ -56,7 +56,7 @@ RUN pnpm --filter @shared/otel build
 RUN pnpm --filter gateway prisma:generate
 
 RUN echo "=== PERSISTENT LOGGER VERSION ===" \
-    && cat shared/persistent-logger/build-version.txt \
+    && cat shared/persistent-logger/build-version.txt
 
 # ---------- DEV ----------
 FROM deps AS dev
@@ -83,7 +83,7 @@ FROM deps AS build
 ENV NODE_ENV=production
 
 RUN echo "=== PERSISTENT LOGGER VERSION ===" \
-    && cat shared/persistent-logger/build-version.txt \
+    && cat shared/persistent-logger/build-version.txt
 
 RUN pnpm --filter gateway build
 
